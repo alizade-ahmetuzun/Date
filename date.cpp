@@ -14,6 +14,11 @@ Date::Date(): Date(1,1,1900) //Delegating ctor
 
 Date::Date(int d, int m, int y) : md(d), mm(m), my(y)
 {
+    if(isleap(my)) {
+        pmonthDays[2] = 29;
+    } else {
+        pmonthDays[2] = 28;
+    }
     if(md<1||md>pmonthDays[mm]) {
         std::cerr << "Day is not correct number\n";
         exit(EXIT_FAILURE);
@@ -41,15 +46,14 @@ Date::Date(const char* p)
     set_year(year);
     set_month(month);
     set_month_day(day);
-
 }
 
 Date::Date(time_t timer)
 {
     tm* ltm = localtime(&timer);
-    my = year_base + ltm->tm_year;
-    mm = 1+ltm->tm_mon;
-    md = ltm->tm_mday;
+    set_year(year_base + ltm->tm_year);
+    set_month(1+ltm->tm_mon);
+    set_month_day(ltm->tm_mday);
 }
 
 int Date::get_month_day() const
@@ -117,12 +121,10 @@ Date::WeekDay Date::get_week_day() const
 
 Date& Date::set_month_day(int day)
 {
-    if(isleap(my)){
-        if(day < 0 || day > pmonthDays[mm])
-        {
-            std::cerr << "Please enter correct day\n";
-            exit(EXIT_FAILURE);
-        }
+    if(day < 0 || day > pmonthDays[mm])
+    {
+        std::cerr << "Please enter correct day\n";
+        exit(EXIT_FAILURE);
     }
     md = day;
     return *this;
@@ -147,6 +149,11 @@ Date& Date::set_year(int year)
         exit(EXIT_FAILURE);
     }
     my = year;
+    if(isleap(year)) {
+        pmonthDays[2] = 29;
+    } else {
+        pmonthDays[2] = 28;
+    }
     return *this;
 }
 
